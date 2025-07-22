@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Task, Project, FilterOptions, ViewMode } from '../types';
 import { useAuth } from './AuthContext';
+import { collaborationService } from '../services/collaborationService';
 
 interface TaskContextType {
   tasks: Task[];
@@ -178,6 +179,23 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setTasks(updatedTasks);
       saveTasks(updatedTasks);
       
+      // Add user as owner of the task
+      await collaborationService.inviteUserToTask(
+        newTask.id,
+        newTask.title,
+        user.id,
+        user.name,
+        user.email,
+        'owner'
+      );
+      
+      // Accept the invitation immediately (since it's the creator)
+      const invitations = collaborationService.getUserInvitations(user.id);
+      const taskInvitation = invitations.find(inv => inv.taskId === newTask.id);
+      if (taskInvitation) {
+        await collaborationService.acceptInvitation(taskInvitation.id, user.id);
+      }
+      
       console.log('✅ Task added successfully:', newTask.title);
     } catch (error) {
       console.error('Error in addTask:', error);
@@ -188,6 +206,12 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return;
 
     try {
+      // Check if user has permission to edit
+      if (!collaborationService.canUserEditTask(id, user.id)) {
+        console.warn('User does not have permission to edit this task');
+        return;
+      }
+      
       const updatedTasks = tasks.map(task => 
         task.id === id ? { ...task, ...updates, updatedAt: new Date() } : task
       );
@@ -205,6 +229,12 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return;
 
     try {
+      // Check if user has permission to delete
+      if (!collaborationService.canUserDeleteTask(id, user.id)) {
+        console.warn('User does not have permission to delete this task');
+        return;
+      }
+      
       const updatedTasks = tasks.filter(task => task.id !== id);
       setTasks(updatedTasks);
       saveTasks(updatedTasks);

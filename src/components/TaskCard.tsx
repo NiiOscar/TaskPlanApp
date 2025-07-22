@@ -11,9 +11,12 @@ import {
   Edit,
   Trash2,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  Eye,
+  Users
 } from 'lucide-react';
 import EditTaskModal from './EditTaskModal';
+import TaskDetailModal from './TaskDetailModal';
 
 interface TaskCardProps {
   task: Task;
@@ -24,6 +27,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, compact = false }) => {
   const { toggleTask, deleteTask, projects } = useTask();
   const [showMenu, setShowMenu] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
   const [showSubtasks, setShowSubtasks] = useState(false);
 
   const project = projects.find(p => p.id === task.projectId);
@@ -104,6 +108,16 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, compact = false }) => {
                       </button>
                       <button
                         onClick={() => {
+                          setShowDetail(true);
+                          setShowMenu(false);
+                        }}
+                        className="w-full px-3 py-2 text-left text-sm hover:bg-white/10 dark:hover:bg-white/5 flex items-center space-x-2 text-white/80 hover:text-white"
+                      >
+                        <Eye size={14} />
+                        <span>View Details</span>
+                      </button>
+                      <button
+                        onClick={() => {
                           deleteTask(task.id);
                           setShowMenu(false);
                         }}
@@ -152,6 +166,26 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, compact = false }) => {
               </div>
             )}
 
+            {/* Collaboration indicator */}
+            {!compact && (
+              <div className="flex items-center justify-between mt-2">
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => setShowDetail(true)}
+                    className="flex items-center space-x-1 text-xs text-white/60 hover:text-white/80 transition-colors"
+                  >
+                    <Users size={12} />
+                    <span>Collaborate</span>
+                  </button>
+                </div>
+                <button
+                  onClick={() => setShowDetail(true)}
+                  className="text-xs text-blue-300 hover:text-blue-200 transition-colors"
+                >
+                  View Details →
+                </button>
+              </div>
+            )}
             {showSubtasks && task.subtasks.length > 0 && (
               <div className="mt-3 pl-4 border-l-2 border-white/20 space-y-2">
                 {task.subtasks.map((subtask) => (
@@ -175,6 +209,13 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, compact = false }) => {
           task={task}
           onClose={() => setShowEdit(false)}
           onSave={() => setShowEdit(false)}
+        />
+      )}
+
+      {showDetail && (
+        <TaskDetailModal
+          task={task}
+          onClose={() => setShowDetail(false)}
         />
       )}
     </>

@@ -1,18 +1,20 @@
 import React from 'react';
 import { useTask } from '../contexts/TaskContext';
 import { useLocation, Link } from 'react-router-dom';
-import { Search, Filter, Plus, ArrowLeft, Bell, Settings, Bot } from 'lucide-react';
+import { Search, Filter, Plus, ArrowLeft, Bell, Settings, Bot, Users } from 'lucide-react';
 import AddTaskModal from './AddTaskModal';
 import FilterModal from './FilterModal';
 import NotificationCenter from './NotificationCenter';
 import SettingsModal from './SettingsModal';
 import AIAssistant from './AIAssistant';
+import CollaborationNotifications from './CollaborationNotifications';
 
 const Header: React.FC = () => {
   const { filterOptions, setFilterOptions, viewMode } = useTask();
   const [showAddTask, setShowAddTask] = React.useState(false);
   const [showFilter, setShowFilter] = React.useState(false);
   const [showNotifications, setShowNotifications] = React.useState(false);
+  const [showCollaboration, setShowCollaboration] = React.useState(false);
   const [showSettings, setShowSettings] = React.useState(false);
   const [showAIAssistant, setShowAIAssistant] = React.useState(false);
   const location = useLocation();
@@ -123,6 +125,17 @@ const Header: React.FC = () => {
                 </div>
               </button>
 
+              {/* Collaboration Center */}
+              <button
+                onClick={() => setShowCollaboration(true)}
+                className="relative p-3 bg-white/10 dark:bg-black/20 backdrop-blur-xl hover:bg-white/20 dark:hover:bg-white/10 rounded-xl transition-all duration-300 border border-white/20 dark:border-white/10 shadow-lg hover:shadow-xl text-white/80 hover:text-white group"
+              >
+                <Users size={20} />
+                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                  Collaboration
+                </div>
+              </button>
+
               {/* Settings */}
               <button
                 onClick={() => setShowSettings(true)}
@@ -209,6 +222,12 @@ const Header: React.FC = () => {
       {showAIAssistant && (
         <AIAssistant
           onClose={() => setShowAIAssistant(false)}
+        />
+      )}
+
+      {showCollaboration && (
+        <CollaborationNotifications
+          onClose={() => setShowCollaboration(false)}
         />
       )}
     </>

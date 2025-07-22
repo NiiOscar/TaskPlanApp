@@ -13,9 +13,12 @@ import {
   User,
   MessageSquare,
   Paperclip,
-  AlertTriangle
+  AlertTriangle,
+  Eye,
+  Users
 } from 'lucide-react';
 import EditTaskModal from './EditTaskModal';
+import TaskDetailModal from './TaskDetailModal';
 
 interface KanbanCardProps {
   task: Task;
@@ -25,6 +28,7 @@ const KanbanCard: React.FC<KanbanCardProps> = ({ task }) => {
   const { toggleTask, deleteTask, projects } = useTask();
   const [showMenu, setShowMenu] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
 
   const project = projects.find(p => p.id === task.projectId);
   const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && !task.completed;
@@ -113,6 +117,17 @@ const KanbanCard: React.FC<KanbanCardProps> = ({ task }) => {
                 >
                   <Edit size={12} />
                   <span>Edit</span>
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowDetail(true);
+                    setShowMenu(false);
+                  }}
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-white/10 dark:hover:bg-white/5 flex items-center space-x-2 text-white/80 hover:text-white"
+                >
+                  <Eye size={12} />
+                  <span>Details</span>
                 </button>
                 <button
                   onClick={(e) => {
@@ -215,6 +230,14 @@ const KanbanCard: React.FC<KanbanCardProps> = ({ task }) => {
                   <MessageSquare className="w-2.5 h-2.5 text-white/60" />
                 </div>
               )}
+              
+              <button
+                onClick={() => setShowDetail(true)}
+                className="w-4 h-4 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
+                title="View collaboration details"
+              >
+                <Users className="w-2.5 h-2.5 text-white/60" />
+              </button>
             </div>
           </div>
         </div>
@@ -225,6 +248,13 @@ const KanbanCard: React.FC<KanbanCardProps> = ({ task }) => {
           task={task}
           onClose={() => setShowEdit(false)}
           onSave={() => setShowEdit(false)}
+        />
+      )}
+
+      {showDetail && (
+        <TaskDetailModal
+          task={task}
+          onClose={() => setShowDetail(false)}
         />
       )}
     </>
