@@ -65,11 +65,6 @@ const CollaborationNotifications: React.FC<CollaborationNotificationsProps> = ({
     }
   };
 
-  const handleMarkAsRead = async (notificationId: string) => {
-    await collaborationService.markNotificationAsRead(notificationId);
-    loadData();
-  };
-
   const getNotificationIcon = (type: CollaborationNotification['type']) => {
     switch (type) {
       case 'task_invitation':
@@ -172,7 +167,7 @@ const CollaborationNotifications: React.FC<CollaborationNotificationsProps> = ({
                           ? 'bg-white/5 border-white/10'
                           : 'bg-blue-500/10 border-blue-400/30'
                       }`}
-                      onClick={() => handleMarkAsRead(notification.id)}
+                      onClick={() => collaborationService.markNotificationAsRead(notification.id)}
                     >
                       <div className="flex items-start space-x-3">
                         {getNotificationIcon(notification.type)}
